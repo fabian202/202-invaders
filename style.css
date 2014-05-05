@@ -1,0 +1,10 @@
+body {
+	margin: 20px;
+	font-family: Arial;
+}
+
+.canvas-container {
+	width: 800px;
+	height: 400px;
+	margin: 0 auto;
+}

@@ -6,23 +6,33 @@ var ship = {
 	x:100,
 	y:canvas.height - 100,
 	width: 50,
-	height: 50,
-	speed : 6
+	height: 70,
+	speed : 6,
+	image: null
 }
 
+//Keyboard keys
 var keyBoard = {};
 var game = {
 	status: 'initializing',
 	enemys: 10
 };
+//Shoots array
 var shoots = [];
+//Enemys array
 var enemys = [];
 var background;
+//Load the game when the background was loaded
 function loadMedia(){
 	background = new Image();
 	background.src = 'space.png';
 	background.onload = function() {
-		var interval = window.setInterval(frameLoop, 1000/55);
+		//Ship 
+		ship.image = new Image();
+		ship.image.src = 'ship.png'
+		ship.image.onload = function() {
+			var interval = window.setInterval(frameLoop, 1000/55);
+		}	
 	}
 }
 function drawBackground(){
@@ -30,8 +40,9 @@ function drawBackground(){
 }
 function drawShip() {
 	ctx.save();
-	ctx.fillStyle = 'red';
-	ctx.fillRect(ship.x,ship.y,ship.width,ship.height);
+	//ctx.fillStyle = 'red';
+	//ctx.fillRect(ship.x,ship.y,ship.width,ship.height);
+	ctx.drawImage(ship.image, ship.x, ship.y, ship.width, ship.height);
 	ctx.restore();
 }
 function drawShoot() {
