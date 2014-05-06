@@ -1,3 +1,8 @@
+//Developed by: Fabian Marin
+//Feel free to do whatever you want with this code ;)
+//Desparche day 05/05/2014 
+
+
 var canvas = document.getElementById('game');
 var ctx = canvas.getContext('2d');
 
