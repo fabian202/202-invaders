@@ -9,7 +9,7 @@ var ctx = canvas.getContext('2d');
 //Main ship
 var ship = {
 	x:100,
-	y:canvas.height - 100,
+	y:canvas.height - 120,
 	width: 50,
 	height: 70,
 	speed : 6,
@@ -36,6 +36,14 @@ var enemyShoots = [];
 //Enemys array
 var enemys = [];
 var background;
+var miniShip = {
+	x: canvas.width,
+	y: canvas.height - 40,
+	width: 25,
+	height: 35,
+	image: null
+}
+var miniShips= [];
 //Load the game when the background was loaded
 function loadMedia(){
 	background = new Image();
@@ -45,7 +53,12 @@ function loadMedia(){
 		ship.image = new Image();
 		ship.image.src = 'ship.png'
 		ship.image.onload = function() {
-			var interval = window.setInterval(frameLoop, 1000/55);
+			//Mini Shi
+			miniShip.image = new Image();
+			miniShip.image.src = 'ship_min.png';
+			miniShip.image.onload = function(){
+				var interval = window.setInterval(frameLoop, 1000/55);
+			}
 		}	
 	}
 }
@@ -66,6 +79,16 @@ function drawShip() {
 	ctx.restore();
 }
 
+function drawLives(){
+	
+	for (var i = 1; i <=  ship.lives; i++) {		
+		ctx.save();
+		ctx.drawImage(miniShip.image, miniShip.x - (i * 50), miniShip.y, miniShip.width, miniShip.height);
+		ctx.restore();
+	};
+	
+	
+}
 
 
 function drawShoot() {
@@ -267,12 +290,25 @@ function moveShip(){
 		//if(ship.counter >= 20) {
 			ship.counter = 0;
 			ship.status = 'dead';
-			game.status = 'over';
-			text.title = 'Se lo bajaron';
-			text.legend = 'Dele a la R para seguir apa';
 			
-			text.counter = 0;
+
+			//text.title = 'Se lo bajaron';
+			//text.legend = 'Dele a la R para seguir apa';			
+			//text.counter = 0;
+
+
 		//}
+
+		//Restart game if there is more lives left
+		if(ship.lives > 0) {
+			game.status = 'restart';
+		} else {
+			game.status = 'over';
+
+			text.title = 'Se lo bajaron';
+			text.legend = 'Dele a la R para seguir apa';			
+			text.counter = 0;
+		}
 	}
 }
 function addKeyEvents(){
@@ -303,6 +339,9 @@ function updateGameStatus(){
 		text.counter = 0;
 		console.log('GANO');
 	} 
+	if(game.status == 'restart') {
+		restart();
+	}
 	/*else if(game.status == 'over' && enemys.length > 0) {
 		game.status = 'game_over';
 		text.title = 'Se lo culearon';
@@ -313,6 +352,32 @@ function updateGameStatus(){
 	if(text.counter >= 0) {
 		text.counter++;
 	}
+}
+
+function restart() {
+	/*
+	ship = {
+		x:100,
+		y:canvas.height - 120,
+		width: 50,
+		height: 70,
+		speed : 6,
+		image: ship.image,
+		status: 'alive',
+		lives: ship.status,
+		counter: 0
+	}
+	*/
+
+
+
+	enemyShoots = [];
+
+
+	ship.x = 100;
+	ship.status = 'alive';
+
+	game.status = 'playing';
 }
 
 function drawText(){
@@ -357,6 +422,7 @@ function frameLoop(){
 
 	drawBackground();
 	drawShip();
+	drawLives();
 	drawShoot();
 	drawEnemys();
 	drawText();
