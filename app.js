@@ -43,21 +43,98 @@ var miniShip = {
 	height: 35,
 	image: null
 }
+var images = ['space.png','ship.png', 'ship_min.png','enemy.png', 'shoot.png', 'enemy_shoot.png'];
+var preloader;
 var miniShips= [];
+var enemyImg, shootImg, enemyShootImg, soundBg,soundShot, soundEnemyShot, soundDead, soundDeadEnemy, soundWin, soundLose;
 //Load the game when the background was loaded
 function loadMedia(){
+	preloader = new createjs.LoadQueue();
+	preloader.on("progress", handleProgress); 
+	preloader.on("complete", handleComplete);	
+
+	//preloader.onProgress = loadProgress;
+	load();
+}
+function load(){
+	while (images.length > 0) {
+		var image = images.shift();
+		preloader.loadFile(image);
+	}
+}
+function handleProgress(e) {	
+	console.log(parseInt(preloader.progress * 100) + '%');
+}
+function handleComplete(e) {
 	background = new Image();
 	background.src = 'space.png';
 	background.onload = function() {
 		//Ship 
 		ship.image = new Image();
 		ship.image.src = 'ship.png'
+
+		//Mini Shi
+		miniShip.image = new Image();
+		miniShip.image.src = 'ship_min.png';
+
+		//Enemy image
+		enemyImg = new Image();
+		enemyImg.src = 'enemy.png';
+
+		//SHoot Image
+		shootImg = new Image();
+		shootImg.src = 'shoot.png';
+
+		//Enemy shoot
+		enemyShootImg = new Image();
+		enemyShootImg.src = 'enemy_shoot.png';
+
+		//Background music
+		soundBg = document.createElement('audio');
+		document.body.appendChild(soundBg);
+		soundBg.setAttribute('src', 'bgmusic.mp3');
+
+		soundBg.play();
+
+		//Player shot
+		soundShot = document.createElement('audio');
+		document.body.appendChild(soundShot);
+		soundShot.setAttribute('src', 'laser_shot.mp3');
+
+		//Enemy shot sound
+		soundEnemyShot = document.createElement('audio');
+		document.body.appendChild(soundEnemyShot);
+		soundEnemyShot.setAttribute('src', 'laser_enemy.mp3');
+		
+		//Player dies
+		soundDead = document.createElement('audio');
+		document.body.appendChild(soundDead);
+		soundDead.setAttribute('src', 'player_explode.wav');
+		
+		//Enemy dies
+		soundDeadEnemy = document.createElement('audio');
+		document.body.appendChild(soundDeadEnemy);
+		soundDeadEnemy.setAttribute('src', 'enemy_explode.wav');
+		 
+		//Win
+		soundWin = document.createElement('audio');
+		document.body.appendChild(soundWin);
+		soundWin.setAttribute('src', 'win.mp3');
+		
+		//Lose
+		soundLose = document.createElement('audio');
+		document.body.appendChild(soundLose);
+		soundLose.setAttribute('src', 'lose.mp3');
+		
+
+
+
+		var interval = window.setInterval(frameLoop, 1000/55);
+
 		ship.image.onload = function() {
-			//Mini Shi
-			miniShip.image = new Image();
-			miniShip.image.src = 'ship_min.png';
+			
 			miniShip.image.onload = function(){
-				var interval = window.setInterval(frameLoop, 1000/55);
+				
 			}
 		}	
 	}
@@ -92,20 +169,26 @@ function drawLives(){
 
 
 function drawShoot() {
-	ctx.save();
-	ctx.fillStyle = 'red';
+	//ctx.save();
+	//ctx.fillStyle = 'red';
 	for (var i in shoots) {
 		var shoot = shoots[i];
-		ctx.fillRect(shoot.x,shoot.y,shoot.width,shoot.height);
+		ctx.drawImage(shootImg,shoot.x,shoot.y,shoot.width,shoot.height);
 	};	
-	ctx.restore();
+	//ctx.restore();
 }
 function fire(){
+
+	var sound = soundShot.cloneNode();
+
+	sound.play();
+
+
 	shoots.push({
-		x: ship.x + 20,
+		x: ship.x + 10,
 		y: ship.y - 10,
-		width: 10,
-		height: 10,
+		width: 30,
+		height: 34,
 		status:'fired'
 	})
 }
@@ -137,7 +220,7 @@ function updateEnemys(){
 			enemys.push({
 				x: 10 + (i * 50),
 				y:10, 
-				height:40, 
+				height:26, 
 				width:40,
 				status:'alive',
 				count: 0
@@ -158,6 +241,11 @@ function updateEnemys(){
 			//console.log(enemy.count)
 
 			if(random(0, enemys.length * 10) == 1) {
+
+				var sound = soundEnemyShot.cloneNode();
+
+				sound.play();
+
 				enemyShoots.push({
 					x: enemy.x,
 					y: enemy.y + enemy.height,
@@ -188,11 +276,11 @@ function drawEnemys(){
 	
 	for (var i in enemys) {
 
-		ctx.save();
-		ctx.fillStyle = 'orange';
+		//ctx.save();
+		//ctx.fillStyle = 'orange';
 		var enemy = enemys[i];
-		ctx.fillRect(enemy.x,enemy.y,enemy.width,enemy.height);
-		ctx.restore();
+		ctx.drawImage(enemyImg,enemy.x,enemy.y,enemy.width,enemy.height);
+		//ctx.restore();
 	};	
 	
 }
@@ -201,11 +289,11 @@ function drawEnemyShoots(){
 	//console.log(enemyShoots);
 	for (var i in enemyShoots) {
 		
-		ctx.save();
-		ctx.fillStyle = 'yellow';
+		//ctx.save();
+		//ctx.fillStyle = 'yellow';
 		var shoot = enemyShoots[i];
-		ctx.fillRect(shoot.x,shoot.y,shoot.width,shoot.height);
-		ctx.restore();
+		ctx.drawImage(enemyShootImg,shoot.x,shoot.y,shoot.width,shoot.height);
+		//ctx.restore();
 	};	
 
 }
@@ -240,6 +328,11 @@ function collitions(){
 			var enemy = enemys[k];
 			//Verify if a shoot make contact with an enemy
 			if(hit(shoot, enemy)) {
+
+				var sound = soundDeadEnemy.cloneNode();
+
+				sound.play();
+
 				enemy.status = 'hit';
 				enemy.counter = 0;
 				shoot.status = 'hitted';
@@ -252,6 +345,9 @@ function collitions(){
 	for (var i in enemyShoots) {
 		var shoot = enemyShoots[i];
 		if(hit(shoot, ship)) {
+
+			soundDead.play();
+
 			ship.status = 'hit';
 			ship.lives--;			
 		}
@@ -306,8 +402,12 @@ function moveShip(){
 			game.status = 'over';
 
 			text.title = 'Se lo bajaron';
-			text.legend = 'Dele a la R para seguir apa';			
+			text.legend = 'Dele un balazo para seguir apa';			
 			text.counter = 0;
+
+			soundBg.pause();
+			soundLose.play();
+
 		}
 	}
 }
@@ -333,11 +433,14 @@ function addKeyEvents(){
 
 function updateGameStatus(){
 	if(game.status == 'playing' && enemys.length == 0) {
+
+		soundBg.pause();
+		soundWin.play();
+
 		game.status = 'win';
 		text.title = 'Gano parce!';
-		text.legend = 'Dele a la R para volver a jugar';
-		text.counter = 0;
-		console.log('GANO');
+		text.legend = 'De un balazo volver a jugar';
+		text.counter = 0;		
 	} 
 	if(game.status == 'restart') {
 		restart();
