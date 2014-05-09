@@ -44,6 +44,15 @@ var miniShip = {
 	image: null
 }
 var images = ['space.png','ship.png', 'ship_min.png','enemy.png', 'shoot.png', 'enemy_shoot.png'];
+var music = [
+		{name:'soundBg', file:'bgmusic.mp3'},
+		{name:'soundShot', file:'laser_shot.mp3'},
+		{name:'soundEnemyShot', file:'laser_enemy.mp3'},
+		{name:'soundDead', file:'player_explode.wav'},
+		{name:'soundDeadEnemy', file:'enemy_explode.wav'},
+		{name:'soundWin', file:'win.mp3'},
+		{name:'soundLose', file:'lose.mp3'},
+	];
 var preloader;
 var miniShips= [];
 var enemyImg, shootImg, enemyShootImg, soundBg,soundShot, soundEnemyShot, soundDead, soundDeadEnemy, soundWin, soundLose;
@@ -63,7 +72,7 @@ function load(){
 	}
 }
 function handleProgress(e) {	
-	console.log(parseInt(preloader.progress * 100) + '%');
+	//console.log(parseInt(preloader.progress * 100) + '%');
 }
 function handleComplete(e) {
 	background = new Image();
@@ -89,43 +98,11 @@ function handleComplete(e) {
 		enemyShootImg = new Image();
 		enemyShootImg.src = 'enemy_shoot.png';
 
-		//Background music
-		soundBg = document.createElement('audio');
-		document.body.appendChild(soundBg);
-		soundBg.setAttribute('src', 'bgmusic.mp3');
-
-		soundBg.play();
-
-		//Player shot
-		soundShot = document.createElement('audio');
-		document.body.appendChild(soundShot);
-		soundShot.setAttribute('src', 'laser_shot.mp3');
-
-		//Enemy shot sound
-		soundEnemyShot = document.createElement('audio');
-		document.body.appendChild(soundEnemyShot);
-		soundEnemyShot.setAttribute('src', 'laser_enemy.mp3');
 		
-		//Player dies
-		soundDead = document.createElement('audio');
-		document.body.appendChild(soundDead);
-		soundDead.setAttribute('src', 'player_explode.wav');
-		
-		//Enemy dies
-		soundDeadEnemy = document.createElement('audio');
-		document.body.appendChild(soundDeadEnemy);
-		soundDeadEnemy.setAttribute('src', 'enemy_explode.wav');
-		 
-		//Win
-		soundWin = document.createElement('audio');
-		document.body.appendChild(soundWin);
-		soundWin.setAttribute('src', 'win.mp3');
-		
-		//Lose
-		soundLose = document.createElement('audio');
-		document.body.appendChild(soundLose);
-		soundLose.setAttribute('src', 'lose.mp3');
-		
+		loadAudio(function(){
+			console.log("cargaron");	
+			playSound('soundBg');
+		});
 
 
 
@@ -138,6 +115,91 @@ function handleComplete(e) {
 			}
 		}	
 	}
+}
+function loadAudio(callback){
+	var countMusic = 0;
+	var canContinue = false;
+	for (var i in music) {
+		var sound = music[i];
+
+		sound.element = document.createElement('audio');
+		document.body.appendChild(sound.element);
+		sound.element.setAttribute('src', sound.file);
+
+		sound.element.addEventListener('canplaythrough', function() { 
+		   //audio.play();
+		   //can play thr
+		   countMusic++;
+		   if(countMusic == music.length) {
+		   	callback();
+		   } 
+		   //console.log('can play throught');
+		}, false);
+		 //console.log('sound ready?');
+	};
+
+	//while (countMusic != music.length) {
+	//	console.log("CARGANDO SONIDOS")
+	//}
+	//console.log(countMusic)
+	//console.log(music.length)
+	//console.log("YA CARGARON LOS SONIDOS");
+
+/*	//Background music
+	soundBg = document.createElement('audio');
+	document.body.appendChild(soundBg);
+	soundBg.setAttribute('src', 'bgmusic.mp3');
+
+	soundBg.play();
+
+	//Player shot
+	soundShot = document.createElement('audio');
+	document.body.appendChild(soundShot);
+	soundShot.setAttribute('src', 'laser_shot.mp3');
+
+	//Enemy shot sound
+	soundEnemyShot = document.createElement('audio');
+	document.body.appendChild(soundEnemyShot);
+	soundEnemyShot.setAttribute('src', 'laser_enemy.mp3');
+	
+	//Player dies
+	soundDead = document.createElement('audio');
+	document.body.appendChild(soundDead);
+	soundDead.setAttribute('src', 'player_explode.wav');
+	
+	//Enemy dies
+	soundDeadEnemy = document.createElement('audio');
+	document.body.appendChild(soundDeadEnemy);
+	soundDeadEnemy.setAttribute('src', 'enemy_explode.wav');
+	 
+	//Win
+	soundWin = document.createElement('audio');
+	document.body.appendChild(soundWin);
+	soundWin.setAttribute('src', 'win.mp3');
+	
+	//Lose
+	soundLose = document.createElement('audio');
+	document.body.appendChild(soundLose);
+	soundLose.setAttribute('src', 'lose.mp3');*/
+}
+function playSound(soundName, clone){
+	var sound = music.filter(function (sound) {
+	    return sound.name === soundName;
+	})[0];
+
+	if(clone) {
+		var audio = sound.element.cloneNode()	
+		audio.play();
+	} else {
+		sound.element.play();
+	}
+}
+function stopSound(soundName){
+	var sound = music.filter(function (sound) {
+	    return sound.name === soundName;
+	})[0];
+
+	sound.element.pause()		
 }
 function drawBackground(){
 	ctx.drawImage(background,0,0);
@@ -179,10 +241,7 @@ function drawShoot() {
 }
 function fire(){
 
-	var sound = soundShot.cloneNode();
-
-	sound.play();
-
+	playSound('soundShot', true);
 
 	shoots.push({
 		x: ship.x + 10,
@@ -240,15 +299,12 @@ function updateEnemys(){
 			enemy.x += Math.sin(enemy.count * Math.PI/90) * 5;
 			//console.log(enemy.count)
 
-			if(random(0, enemys.length * 10) == 1) {
-
-				var sound = soundEnemyShot.cloneNode();
-
-				sound.play();
+			if(random(0, enemys.length * 10) == 1) {				
+				playSound('soundEnemyShot', true);
 
 				enemyShoots.push({
 					x: enemy.x,
-					y: enemy.y + enemy.height,
+   					y: enemy.y + enemy.height,
 					width: 10,
 					height: 30,
 					counter: 0
@@ -329,9 +385,7 @@ function collitions(){
 			//Verify if a shoot make contact with an enemy
 			if(hit(shoot, enemy)) {
 
-				var sound = soundDeadEnemy.cloneNode();
-
-				sound.play();
+				playSound('soundDeadEnemy', true);
 
 				enemy.status = 'hit';
 				enemy.counter = 0;
@@ -345,9 +399,7 @@ function collitions(){
 	for (var i in enemyShoots) {
 		var shoot = enemyShoots[i];
 		if(hit(shoot, ship)) {
-
-			soundDead.play();
-
+			playSound('soundDead', true);
 			ship.status = 'hit';
 			ship.lives--;			
 		}
@@ -404,9 +456,10 @@ function moveShip(){
 			text.title = 'Se lo bajaron';
 			text.legend = 'Dele un balazo para seguir apa';			
 			text.counter = 0;
+			
+			stopSound('soundBg');
+			playSound('soundLose');
 
-			soundBg.pause();
-			soundLose.play();
 
 		}
 	}
@@ -433,9 +486,8 @@ function addKeyEvents(){
 
 function updateGameStatus(){
 	if(game.status == 'playing' && enemys.length == 0) {
-
-		soundBg.pause();
-		soundWin.play();
+		stopSound('soundBg');
+		playSound('soundWin');
 
 		game.status = 'win';
 		text.title = 'Gano parce!';
