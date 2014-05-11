@@ -43,15 +43,20 @@ var miniShip = {
 	height: 35,
 	image: null
 }
-var images = ['space.png','ship.png', 'ship_min.png','enemy.png', 'shoot.png', 'enemy_shoot.png'];
+var aImg = "assets/images/";
+var assetsJs = "assets/js/";
+var assetsLib = "assets/lib/";
+var aMusic = "assets/music/";
+
+var images = [aImg + 'bg.jpg',aImg + 'space.png',aImg + 'ship.png', aImg + 'ship_min.png',aImg + 'enemy.png', aImg + 'shoot.png', aImg + 'enemy_shoot.png'];
 var music = [
-		{name:'soundBg', file:'bgmusic.mp3'},
-		{name:'soundShot', file:'laser_shot.mp3'},
-		{name:'soundEnemyShot', file:'laser_enemy.mp3'},
-		{name:'soundDead', file:'player_explode.wav'},
-		{name:'soundDeadEnemy', file:'enemy_explode.wav'},
-		{name:'soundWin', file:'win.mp3'},
-		{name:'soundLose', file:'lose.mp3'},
+		{name:'soundBg', file: aMusic + 'bgmusic.mp3'},
+		{name:'soundShot', file: aMusic + 'laser_shot.mp3'},
+		{name:'soundEnemyShot', file: aMusic + 'laser_enemy.mp3'},
+		{name:'soundDead', file: aMusic + 'player_explode.wav'},
+		{name:'soundDeadEnemy', file: aMusic + 'enemy_explode.wav'},
+		{name:'soundWin', file: aMusic + 'win.mp3'},
+		{name:'soundLose', file: aMusic + 'lose.mp3'},
 	];
 var preloader;
 var miniShips= [];
@@ -76,31 +81,30 @@ function handleProgress(e) {
 }
 function handleComplete(e) {
 	background = new Image();
-	background.src = 'space.png';
+	background.src = aImg + 'space.png';
 	background.onload = function() {
 		//Ship 
 		ship.image = new Image();
-		ship.image.src = 'ship.png'
+		ship.image.src = aImg +  'ship.png'
 
 		//Mini Shi
 		miniShip.image = new Image();
-		miniShip.image.src = 'ship_min.png';
+		miniShip.image.src = aImg +  'ship_min.png';
 
 		//Enemy image
 		enemyImg = new Image();
-		enemyImg.src = 'enemy.png';
+		enemyImg.src = aImg +  'enemy.png';
 
 		//SHoot Image
 		shootImg = new Image();
-		shootImg.src = 'shoot.png';
+		shootImg.src = aImg +  'shoot.png';
 
 		//Enemy shoot
 		enemyShootImg = new Image();
-		enemyShootImg.src = 'enemy_shoot.png';
+		enemyShootImg.src = aImg +  'enemy_shoot.png';
 
 		
-		loadAudio(function(){
-			console.log("cargaron");	
+		loadAudio(function(){			
 			playSound('soundBg');
 		});
 
